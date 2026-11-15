@@ -1,1043 +1,1091 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2775.2">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Avanish Links Hub · Smart Workspace</title>
+  <!-- SheetJS for browser-side Excel reading -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-alt: #f1f5f9;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-soft: #eff6ff;
+      --accent: #059669;
+      --accent-soft: #ecfdf5;
+      --pin: #f59e0b;
+      --danger: #ef4444;
+      --shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+      --radius: 14px;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0b1120;
+      --surface: #1e293b;
+      --surface-alt: #0f172a;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --primary: #3b82f6;
+      --primary-hover: #60a5fa;
+      --primary-soft: rgba(59, 130, 246, 0.15);
+      --accent: #10b981;
+      --accent-soft: rgba(16, 185, 129, 0.15);
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .container { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
+
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      max-width: 1120px;
+      margin: 0 auto;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-icon {
+      width: 36px; height: 36px;
+      background: var(--primary);
+      color: #fff;
+      border-radius: 10px;
+      display: grid; place-items: center;
+      font-weight: 700; font-size: 18px;
+    }
+    .brand strong { display: block; font-size: 16px; }
+    .brand small { color: var(--text-muted); font-size: 12px; }
+
+    nav { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      padding: 7px 13px;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+    .btn:hover { background: var(--surface-alt); }
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 7px; }
+
+    .hero {
+      padding: 32px 0 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .tag {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--primary);
+      display: block;
+      margin-bottom: 6px;
+    }
+    .hero h1 { font-size: 28px; font-weight: 700; line-height: 1.2; margin-bottom: 8px; }
+    .hero h1 em { font-style: normal; color: var(--primary); }
+    .hero p { color: var(--text-muted); font-size: 14px; max-width: 520px; }
+
+    .stats { display: flex; gap: 12px; flex-wrap: wrap; }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 12px 18px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      min-width: 105px;
+    }
+    .stat-card small { display: block; font-size: 11px; color: var(--text-muted); }
+    .stat-card strong { font-size: 20px; font-weight: 700; }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+    .search-box {
+      flex: 1;
+      min-width: 240px;
+      position: relative;
+    }
+    .search-box input {
+      width: 100%;
+      padding: 10px 14px 10px 36px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+    }
+    .search-box input:focus { border-color: var(--primary); }
+    .search-box span {
+      position: absolute;
+      left: 12px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .section { margin-bottom: 34px; }
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .section-head h2 { font-size: 18px; font-weight: 600; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+      position: relative;
+    }
+    .card.pinned { border-color: var(--pin); }
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+    .badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: var(--primary-soft);
+      color: var(--primary);
+      display: inline-block;
+      margin-bottom: 6px;
+    }
+    .card h3 { font-size: 16px; font-weight: 600; }
+    .card-url {
+      font-size: 12px;
+      color: var(--text-muted);
+      word-break: break-all;
+      background: var(--surface-alt);
+      padding: 6px 9px;
+      border-radius: 7px;
+      font-family: monospace;
+    }
+    .card-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      padding-top: 4px;
+    }
+    .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 15px;
+      padding: 2px 5px;
+      border-radius: 5px;
+    }
+    .icon-btn:hover { background: var(--surface-alt); color: var(--text); }
+    .icon-btn.active-pin { color: var(--pin); }
+
+    .empty-state {
+      background: var(--surface);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 14px;
+    }
+    .quick-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .quick-card p { font-size: 13px; color: var(--text-muted); }
+
+    .table-container {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow-x: auto;
+      margin-top: 14px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13px;
+    }
+    th, td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      background: var(--surface-alt);
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+    tr:last-child td { border-bottom: none; }
+
+    dialog {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--surface);
+      color: var(--text);
+      padding: 22px;
+      max-width: 500px;
+      width: 92%;
+      margin: auto;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+    }
+    dialog::backdrop { background: rgba(15, 23, 42, 0.55); backdrop-filter: blur(2px); }
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .form-group { margin-bottom: 13px; }
+    .form-group label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; color: var(--text-muted); }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface-alt);
+      color: var(--text);
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    .emi-box {
+      background: var(--primary-soft);
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 12px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .emi-main { grid-column: 1 / -1; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+    .emi-main strong { font-size: 22px; color: var(--primary); }
+
+    .drawer {
+      position: fixed;
+      top: 0; right: -380px;
+      width: 350px; max-width: 90vw;
+      height: 100vh;
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      box-shadow: -8px 0 24px rgba(0,0,0,0.12);
+      z-index: 60;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      transition: right 0.25s ease;
+    }
+    .drawer.open { right: 0; }
+    .drawer textarea {
+      flex: 1;
+      width: 100%;
+      resize: none;
+      border: 1px solid var(--border);
+      background: var(--surface-alt);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 14px;
+      line-height: 1.6;
+      outline: none;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #0f172a;
+      color: #fff;
+      padding: 9px 18px;
+      border-radius: 99px;
+      font-size: 13px;
+      font-weight: 500;
+      z-index: 100;
+      transition: transform 0.25s ease;
+      box-shadow: 0 10px 15px rgba(0,0,0,0.2);
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 20px 0;
+      margin-top: 40px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
   </style>
 </head>
 <body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html lang="en" data-theme="light"&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta charset="UTF-8" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;title&gt;Avanish Links Hub · Smart Workspace&lt;/title&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;!-- SheetJS for browser-side Excel reading --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"&gt;&lt;/script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;style&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>:root {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--bg: #f8fafc;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--surface: #ffffff;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--surface-alt: #f1f5f9;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--text: #0f172a;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--text-muted: #64748b;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--border: #e2e8f0;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--primary: #2563eb;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--primary-hover: #1d4ed8;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--primary-soft: #eff6ff;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--accent: #059669;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--accent-soft: #ecfdf5;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--pin: #f59e0b;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--danger: #ef4444;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--radius: 14px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>[data-theme="dark"] {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--bg: #0b1120;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--surface: #1e293b;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--surface-alt: #0f172a;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--text: #f8fafc;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--text-muted: #94a3b8;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--border: #334155;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--primary: #3b82f6;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--primary-hover: #60a5fa;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--primary-soft: rgba(59, 130, 246, 0.15);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--accent: #10b981;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--accent-soft: rgba(16, 185, 129, 0.15);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--shadow: 0 4px 12px rgba(0, 0, 0, 0.25);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>* { box-sizing: border-box; margin: 0; padding: 0; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>body {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--bg);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--text);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>line-height: 1.5;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>transition: background 0.2s, color 0.2s;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.container { max-width: 1120px; margin: 0 auto; padding: 0 20px; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>header {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--surface);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-bottom: 1px solid var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>position: sticky;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>top: 0;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>z-index: 40;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.header-inner {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>justify-content: space-between;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 14px 20px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>max-width: 1120px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin: 0 auto;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>gap: 12px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>flex-wrap: wrap;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.brand { display: flex; align-items: center; gap: 10px; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.brand-icon {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>width: 36px; height: 36px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--primary);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: #fff;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: grid; place-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 700; font-size: 18px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.brand strong { display: block; font-size: 16px; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.brand small { color: var(--text-muted); font-size: 12px; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>nav { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.btn {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--surface);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--text);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 7px 13px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 9px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 13px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 500;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>cursor: pointer;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: inline-flex;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>gap: 6px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>text-decoration: none;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>transition: all 0.15s;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.btn:hover { background: var(--surface-alt); }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.btn-primary {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--primary);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: #fff;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-color: var(--primary);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.btn-primary:hover { background: var(--primary-hover); }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 7px; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.hero {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 32px 0 24px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>justify-content: space-between;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>align-items: flex-end;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>gap: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>flex-wrap: wrap;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.tag {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 11px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 700;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>letter-spacing: 0.08em;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>text-transform: uppercase;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--primary);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: block;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 6px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.hero h1 { font-size: 28px; font-weight: 700; line-height: 1.2; margin-bottom: 8px; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.hero h1 em { font-style: normal; color: var(--primary); }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.hero p { color: var(--text-muted); font-size: 14px; max-width: 520px; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.stats { display: flex; gap: 12px; flex-wrap: wrap; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.stat-card {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--surface);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 12px 18px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: var(--radius);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>box-shadow: var(--shadow);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>min-width: 105px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.stat-card small { display: block; font-size: 11px; color: var(--text-muted); }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.stat-card strong { font-size: 20px; font-weight: 700; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.toolbar {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>gap: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 28px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>flex-wrap: wrap;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.search-box {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>flex: 1;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>min-width: 240px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>position: relative;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.search-box input {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 10px 14px 10px 36px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--surface);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--text);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 14px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>outline: none;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.search-box input:focus { border-color: var(--primary); }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.search-box span {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>position: absolute;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>left: 12px; top: 50%;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>transform: translateY(-50%);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--text-muted);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 14px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.section { margin-bottom: 34px; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.section-head {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>justify-content: space-between;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 14px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.section-head h2 { font-size: 18px; font-weight: 600; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.grid {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: grid;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));</p>
-<p class="p1"><span class="Apple-converted-space">      </span>gap: 14px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.card {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--surface);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: var(--radius);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 16px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>box-shadow: var(--shadow);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>flex-direction: column;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>justify-content: space-between;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>gap: 12px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>position: relative;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.card.pinned { border-color: var(--pin); }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.badge {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 11px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 600;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 2px 8px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 6px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--primary-soft);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--primary);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: inline-block;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 6px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.card h3 { font-size: 16px; font-weight: 600; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.card-url {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 12px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--text-muted);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>word-break: break-all;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--surface-alt);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 6px 9px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 7px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-family: monospace;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.card-actions {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>gap: 6px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>flex-wrap: wrap;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding-top: 4px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.icon-btn {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: none;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border: none;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>cursor: pointer;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--text-muted);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 15px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 2px 5px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 5px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.icon-btn:hover { background: var(--surface-alt); color: var(--text); }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.icon-btn.active-pin { color: var(--pin); }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.empty-state {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--surface);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border: 1px dashed var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: var(--radius);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 24px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>text-align: center;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--text-muted);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 13px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.quick-grid {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: grid;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));</p>
-<p class="p1"><span class="Apple-converted-space">      </span>gap: 14px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.quick-card {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--surface);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: var(--radius);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 16px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>box-shadow: var(--shadow);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>flex-direction: column;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>justify-content: space-between;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>gap: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.quick-card p { font-size: 13px; color: var(--text-muted); }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.table-container {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--surface);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: var(--radius);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>box-shadow: var(--shadow);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>overflow-x: auto;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-top: 14px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>table {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-collapse: collapse;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>text-align: left;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 13px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>th, td {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 12px 16px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-bottom: 1px solid var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>th {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--surface-alt);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 600;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--text-muted);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>tr:last-child td { border-bottom: none; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>dialog {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 16px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--surface);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--text);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 22px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>max-width: 500px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>width: 92%;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin: auto;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>dialog::backdrop { background: rgba(15, 23, 42, 0.55); backdrop-filter: blur(2px); }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.modal-head {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>justify-content: space-between;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 16px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.form-group { margin-bottom: 13px; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.form-group label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; color: var(--text-muted); }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.form-group input, .form-group select, .form-group textarea {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 9px 12px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 8px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--surface-alt);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--text);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 14px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-family: inherit;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.emi-box {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--primary-soft);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 12px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 14px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-top: 12px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: grid;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>grid-template-columns: 1fr 1fr;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>gap: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.emi-main { grid-column: 1 / -1; border-bottom: 1px solid var(--border); padding-bottom: 8px; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.emi-main strong { font-size: 22px; color: var(--primary); }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.drawer {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>position: fixed;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>top: 0; right: -380px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>width: 350px; max-width: 90vw;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>height: 100vh;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--surface);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-left: 1px solid var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>box-shadow: -8px 0 24px rgba(0,0,0,0.12);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>z-index: 60;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>flex-direction: column;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>transition: right 0.25s ease;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.drawer.open { right: 0; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.drawer textarea {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>flex: 1;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>resize: none;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--surface-alt);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--text);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 12px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 14px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>line-height: 1.6;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>outline: none;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.toast {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>position: fixed;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>bottom: 20px; left: 50%;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>transform: translateX(-50%) translateY(80px);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: #0f172a;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: #fff;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 9px 18px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 99px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 13px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 500;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>z-index: 100;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>transition: transform 0.25s ease;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>box-shadow: 0 10px 15px rgba(0,0,0,0.2);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.toast.show { transform: translateX(-50%) translateY(0); }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>footer {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-top: 1px solid var(--border);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 20px 0;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-top: 40px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 13px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--text-muted);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.footer-inner {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>justify-content: space-between;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>flex-wrap: wrap;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>gap: 12px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/style&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;header&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="header-inner"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="brand"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="brand-icon"&gt;↗&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;strong&gt;Avanish Links Hub&lt;/strong&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;small&gt;Smart Workspace &amp; Loan Portal&lt;/small&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;nav&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;button class="btn btn-primary" onclick="openModal('companySearchPortalModal')"&gt;🏢 Company Search Hub&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;button class="btn" onclick="openModal('sheetsModal')"&gt;📊 Sheets&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;button class="btn" onclick="openModal('emiModal')"&gt;🧮 EMI Calc&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;button class="btn" onclick="toggleNotes()"&gt;📝 Notes&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;button class="btn" onclick="toggleTheme()" id="themeBtn" title="Toggle Theme"&gt;🌙&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/nav&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/header&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;main class="container"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;section class="hero"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;span class="tag"&gt;AVNISH LOAN OPERATIONS &amp;amp; WORKSPACE&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;h1&gt;Smart campaign links &amp;amp;&lt;br&gt;&lt;em&gt;Multi-bank company search.&lt;/em&gt;&lt;/h1&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;p&gt;Manage your bank UTMs, quick access tools, and search corporate employer categories across all partner lenders instantly.&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="stats"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="stat-card"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;small&gt;Active Links&lt;/small&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;strong id="statTotal"&gt;0&lt;/strong&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="stat-card"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;small&gt;Loaded Companies&lt;/small&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;strong id="statCompaniesCount"&gt;0&lt;/strong&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="stat-card"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;small&gt;Partner Banks&lt;/small&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;strong id="statBanksCount"&gt;0&lt;/strong&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/section&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="toolbar"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="search-box"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;span&gt;🔍&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;input type="text" id="searchInput" placeholder="Search UTM links by name, bank, or tag... (Ctrl + K)" oninput="renderLinks()" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;button class="btn btn-primary" onclick="openAddLinkModal()"&gt;+ Add New Link&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;button class="btn" onclick="openModal('pitchSettingsModal')"&gt;⚙️ Pitch Template&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;section class="section" id="pinnedSection" style="display:none;"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="section-head"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;span class="tag"&gt;PINNED ACCESS&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;h2&gt;Starred &amp;amp; Frequent Links&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="grid" id="pinnedGrid"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/section&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;section class="section"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="section-head"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;span class="tag"&gt;BANK CAMPAIGNS&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;h2&gt;Banks UTM Links&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;button class="btn btn-sm" onclick="openAddLinkModal('bank')"&gt;+ Add Bank Link&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="grid" id="bankGrid"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/section&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;section class="section"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="section-head"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;span class="tag"&gt;OTHER CAMPAIGNS&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;h2&gt;Other UTM Links&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;button class="btn btn-sm" onclick="openAddLinkModal('other')"&gt;+ Add Other Link&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="grid" id="otherGrid"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/section&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;section class="section"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="section-head"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;span class="tag"&gt;QUICK ACCESS&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;h2&gt;Daily Work &amp;amp; AI Tools&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="quick-grid"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;article class="quick-card"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;span class="badge"&gt;AI ASSISTANT&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;h3&gt;ChatGPT&lt;/h3&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;p&gt;AI assistant for drafts and troubleshooting.&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;a class="btn btn-sm" href="https://chatgpt.com" target="_blank" rel="noopener"&gt;Open website →&lt;/a&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/article&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;article class="quick-card"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;span class="badge"&gt;AI ASSISTANT&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;h3&gt;Gemini&lt;/h3&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;p&gt;Google AI assistant for research and analysis.&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;a class="btn btn-sm" href="https://gemini.google.com" target="_blank" rel="noopener"&gt;Open website →&lt;/a&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/article&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;article class="quick-card"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;span class="badge"&gt;BUSINESS&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;h3&gt;CRM Portal&lt;/h3&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;p&gt;Manage leads and client pipelines.&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;a class="btn btn-sm" href="https://www.hubspot.com/products/crm" target="_blank" rel="noopener"&gt;Open website →&lt;/a&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/article&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;article class="quick-card"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;span class="badge"&gt;WORKSPACE&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;h3&gt;Notion&lt;/h3&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;p&gt;Documentation, SOPs, and notes.&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;a class="btn btn-sm" href="https://www.notion.so" target="_blank" rel="noopener"&gt;Open website →&lt;/a&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/article&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/section&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/main&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;footer&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="container footer-inner"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div&gt;Avanish Sharma · Smart Hub · &lt;span&gt;Saved locally in browser&lt;/span&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div style="display:flex; gap:8px;"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;button class="btn btn-sm" onclick="exportBackup()"&gt;⬇️ Export Backup&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;button class="btn btn-sm" onclick="document.getElementById('importFile').click()"&gt;⬆️ Import Backup&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;input type="file" id="importFile" accept=".json" style="display:none" onchange="importBackup(event)" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/footer&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;dialog id="companySearchPortalModal" style="max-width:900px; width:95%;"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="modal-head"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;h3&gt;🏢 Multi-Bank Company Search Hub&lt;/h3&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;button class="icon-btn" onclick="closeModal('companySearchPortalModal')"&gt;✕&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;p style="font-size:13px; color:var(--text-muted); margin-bottom:14px;"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>Upload your multi-sheet master Excel file once. Search any company name to instantly view its category across all partner banks side-by-side.</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/p&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div style="background:var(--surface-alt); border:2px dashed var(--border); padding:16px; border-radius:12px; text-align:center; margin-bottom:16px;"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;label style="cursor:pointer; display:block;"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;span style="font-weight:600; color:var(--primary); display:block; margin-bottom:4px;"&gt;📁 Upload Master Excel File (.xlsx)&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;span style="font-size:12px; color:var(--text-muted);"&gt;Supports multi-sheet bank workbooks with EMPLOYER_NAME &amp; EMPLOYER_CATEGORY&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;input type="file" id="masterExcelInput" accept=".xlsx, .xls" style="display:none" onchange="handleMasterExcelUpload(event)" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div id="uploadStatus" style="font-size:12px; color:var(--accent); margin-top:8px; font-weight:600;"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="form-group"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;input type="text" id="masterCompanySearchInput" placeholder="Type company name (e.g. HDFC, Tata, Infosys...) to search across all banks..." oninput="renderMasterSearchResults()" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="table-container" style="max-height:400px; overflow-y:auto;"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;table&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;thead&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;tr&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;th&gt;Company Legal Name&lt;/th&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;th&gt;Primary Category&lt;/th&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;th&gt;Lender Classifications (Bank &amp;amp; Category)&lt;/th&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;/tr&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/thead&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;tbody id="masterResultsBody"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;tr&gt;&lt;td colspan="3" style="text-align:center; color:var(--text-muted); padding:24px;"&gt;Please upload your master Excel file above to begin searching.&lt;/td&gt;&lt;/tr&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/tbody&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/table&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/dialog&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;dialog id="linkModal"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="modal-head"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;h3 id="linkModalTitle"&gt;Add Campaign Link&lt;/h3&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;button class="icon-btn" onclick="closeModal('linkModal')"&gt;✕&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;form onsubmit="saveLink(event)"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;input type="hidden" id="editId" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="form-group"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;label&gt;Category&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;select id="linkCategory"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;option value="bank"&gt;Banks UTM Links&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;option value="other"&gt;Other UTM Links&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/select&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="form-group"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;label&gt;Link Title&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;input type="text" id="linkTitle" required placeholder="e.g. HDFC Personal Loan UTM" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="form-group"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;label&gt;Campaign / UTM URL&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;input type="url" id="linkUrl" required placeholder="https://..." /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="form-group"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;label&gt;Short Tag / Note (Optional)&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;input type="text" id="linkTag" placeholder="e.g. Salaried · Instant Approval" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;button type="button" class="btn" onclick="closeModal('linkModal')"&gt;Cancel&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;button type="submit" class="btn btn-primary"&gt;Save Link&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/form&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/dialog&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;dialog id="pitchSettingsModal"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="modal-head"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;h3&gt;Customize Pitch Message&lt;/h3&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;button class="icon-btn" onclick="closeModal('pitchSettingsModal')"&gt;✕&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="form-group"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;label&gt;Use &lt;code&gt;{TITLE}&lt;/code&gt; and &lt;code&gt;{URL}&lt;/code&gt; placeholders:&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;textarea id="pitchTemplateInput" rows="4"&gt;&lt;/textarea&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div style="display:flex; justify-content:flex-end; gap:8px;"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;button class="btn" onclick="closeModal('pitchSettingsModal')"&gt;Close&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;button class="btn btn-primary" onclick="savePitchTemplate()"&gt;Save Template&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/dialog&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;dialog id="qrModal" style="text-align:center; max-width:340px;"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="modal-head"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;h3 id="qrTitle" style="font-size:15px;"&gt;Scan Link&lt;/h3&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;button class="icon-btn" onclick="closeModal('qrModal')"&gt;✕&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;img id="qrImage" src="" alt="QR Code" style="width:210px; height:210px; border-radius:10px; border:1px solid var(--border); padding:8px; background:#fff;" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;p id="qrUrlText" style="font-size:11px; color:var(--text-muted); margin-top:10px; word-break:break-all;"&gt;&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/dialog&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;dialog id="emiModal"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="modal-head"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;h3&gt;Quick Loan EMI Calculator&lt;/h3&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;button class="icon-btn" onclick="closeModal('emiModal')"&gt;✕&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="form-group"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;label&gt;Loan Amount (₹)&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;input type="number" id="emiAmount" value="500000" oninput="calcEMI()" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="form-group"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;label&gt;Interest Rate (% p.a.)&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;input type="number" step="0.1" id="emiRate" value="10.75" oninput="calcEMI()" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="form-group"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;label&gt;Tenure (Months)&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;input type="number" id="emiMonths" value="36" oninput="calcEMI()" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="emi-box"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="emi-main"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;small style="display:block; color:var(--text-muted);"&gt;Monthly EMI&lt;/small&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;strong id="emiMonthly"&gt;₹16,310&lt;/strong&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;small style="display:block; color:var(--text-muted);"&gt;Total Interest&lt;/small&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;strong id="emiInterest"&gt;₹87,160&lt;/strong&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;small style="display:block; color:var(--text-muted);"&gt;Total Payable&lt;/small&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;strong id="emiTotal"&gt;₹5,87,160&lt;/strong&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/dialog&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;dialog id="sheetsModal"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="modal-head"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;h3&gt;Company Excel Sheets&lt;/h3&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;button class="icon-btn" onclick="closeModal('sheetsModal')"&gt;✕&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;p style="font-size:13px; color:var(--text-muted); margin-bottom:12px;"&gt;Save quick links to your Google Sheets or payout trackers.&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="sheetsList" style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;form onsubmit="addSheet(event)" style="display:flex; gap:6px; flex-wrap:wrap;"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;input type="text" id="sheetName" placeholder="Sheet Name" required style="flex:1; padding:8px; border-radius:8px; border:1px solid var(--border); background:var(--surface-alt); color:var(--text);" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;input type="url" id="sheetUrl" placeholder="Sheet URL" required style="flex:1; padding:8px; border-radius:8px; border:1px solid var(--border); background:var(--surface-alt); color:var(--text);" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;button type="submit" class="btn btn-primary btn-sm"&gt;Add&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/form&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/dialog&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;aside class="drawer" id="notesDrawer"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="modal-head"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;h3&gt;📝 Quick Scratchpad&lt;/h3&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;button class="icon-btn" onclick="toggleNotes()"&gt;✕&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;"&gt;Auto-saves as you type.&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;textarea id="notesArea" placeholder="Write client notes or callbacks here..." oninput="saveNotes()"&gt;&lt;/textarea&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/aside&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="toast" id="toast"&gt;Copied!&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const STORAGE_KEY = 'avanish_hub_data_v2';</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const DEFAULT_PITCH = "Hi, here is your verified application link for {TITLE}:\n{URL}\n\nLet me know once you complete the form!";</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>let state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>links: [],</p>
-<p class="p1"><span class="Apple-converted-space">      </span>sheets: [],</p>
-<p class="p1"><span class="Apple-converted-space">      </span>notes: "",</p>
-<p class="p1"><span class="Apple-converted-space">      </span>pitchTemplate: DEFAULT_PITCH,</p>
-<p class="p1"><span class="Apple-converted-space">      </span>theme: "light",</p>
-<p class="p1"><span class="Apple-converted-space">      </span>totalCopies: 0,</p>
-<p class="p1"><span class="Apple-converted-space">      </span>masterCompanies: []</p>
-<p class="p1"><span class="Apple-converted-space">    </span>};</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function persist() {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>localStorage.setItem(STORAGE_KEY, JSON.stringify(state));</p>
-<p class="p1"><span class="Apple-converted-space">      </span>updateStats();</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function showToast(msg) {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const t = document.getElementById('toast');</p>
-<p class="p1"><span class="Apple-converted-space">      </span>t.textContent = msg;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>t.classList.add('show');</p>
-<p class="p1"><span class="Apple-converted-space">      </span>setTimeout(() =&gt; t.classList.remove('show'), 2200);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function applyTheme() {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>document.documentElement.setAttribute('data-theme', state.theme || 'light');</p>
-<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('themeBtn').textContent = state.theme === 'dark' ? '☀️' : '🌙';</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>function toggleTheme() {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>state.theme = state.theme === 'dark' ? 'light' : 'dark';</p>
-<p class="p1"><span class="Apple-converted-space">      </span>applyTheme();</p>
-<p class="p1"><span class="Apple-converted-space">      </span>persist();</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function openModal(id) {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>if (id === 'pitchSettingsModal') {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('pitchTemplateInput').value = state.pitchTemplate || DEFAULT_PITCH;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>}</p>
-<p class="p1"><span class="Apple-converted-space">      </span>if (id === 'emiModal') calcEMI();</p>
-<p class="p1"><span class="Apple-converted-space">      </span>if (id === 'sheetsModal') renderSheets();</p>
-<p class="p1"><span class="Apple-converted-space">      </span>if (id === 'companySearchPortalModal') renderMasterSearchResults();</p>
-<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById(id).showModal();</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>function closeModal(id) { document.getElementById(id).close(); }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function handleMasterExcelUpload(e) {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const file = e.target.files[0];</p>
-<p class="p1"><span class="Apple-converted-space">      </span>if (!file) return;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('uploadStatus').textContent = "Reading multi-bank sheets...";</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>const reader = new FileReader();</p>
-<p class="p1"><span class="Apple-converted-space">      </span>reader.onload = function(evt) {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>try {</p>
-<p class="p1"><span class="Apple-converted-space">          </span>const data = new Uint8Array(evt.target.result);</p>
-<p class="p1"><span class="Apple-converted-space">          </span>const workbook = XLSX.read(data, { type: 'array' });</p>
-<p class="p1"><span class="Apple-converted-space">          </span>let allRecords = [];</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">          </span>workbook.SheetNames.forEach(sheetName =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const worksheet = workbook.Sheets[sheetName];</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const json = XLSX.utils.sheet_to_json(worksheet, { defval: "" });</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>json.forEach(row =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">              </span>const normRow = {};</p>
-<p class="p1"><span class="Apple-converted-space">              </span>Object.keys(row).forEach(k =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>normRow[k.trim().toUpperCase()] = row[k];</p>
-<p class="p1"><span class="Apple-converted-space">              </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">              </span>const compName = normRow['EMPLOYER_NAME'] || normRow['COMPANY NAME'] || normRow['COMPANY'];</p>
-<p class="p1"><span class="Apple-converted-space">              </span>const category = normRow['EMPLOYER_CATEGORY'] || normRow['CATEGORY'] || normRow['CAT'];</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">              </span>if (compName) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>allRecords.push({</p>
-<p class="p1"><span class="Apple-converted-space">                  </span>company: String(compName).trim().toUpperCase(),</p>
-<p class="p1"><span class="Apple-converted-space">                  </span>bank: sheetName.trim(),</p>
-<p class="p1"><span class="Apple-converted-space">                  </span>category: String(category || 'Unclassified').trim()</p>
-<p class="p1"><span class="Apple-converted-space">                </span>});</p>
-<p class="p1"><span class="Apple-converted-space">              </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p1"><span class="Apple-converted-space">          </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">          </span>state.masterCompanies = allRecords;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>persist();</p>
-<p class="p1"><span class="Apple-converted-space">          </span>document.getElementById('uploadStatus').textContent = `Successfully loaded ${allRecords.length.toLocaleString()} records across ${workbook.SheetNames.length} bank sheets!`;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>renderMasterSearchResults();</p>
-<p class="p1"><span class="Apple-converted-space">          </span>showToast('Master company data loaded!');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>} catch (err) {</p>
-<p class="p1"><span class="Apple-converted-space">          </span>console.error(err);</p>
-<p class="p1"><span class="Apple-converted-space">          </span>document.getElementById('uploadStatus').textContent = "Error parsing excel file.";</p>
-<p class="p1"><span class="Apple-converted-space">          </span>showToast('Failed to read Excel file');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">      </span>};</p>
-<p class="p1"><span class="Apple-converted-space">      </span>reader.readAsArrayBuffer(file);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function renderMasterSearchResults() {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const q = (document.getElementById('masterCompanySearchInput')?.value || '').toLowerCase().trim();</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const tbody = document.getElementById('masterResultsBody');</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const records = state.masterCompanies || [];</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>if (records.length === 0) {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>tbody.innerHTML = `&lt;tr&gt;&lt;td colspan="3" style="text-align:center; color:var(--text-muted); padding:24px;"&gt;No master company data loaded yet. Please upload your Excel file above.&lt;/td&gt;&lt;/tr&gt;`;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>return;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>const grouped = {};</p>
-<p class="p1"><span class="Apple-converted-space">      </span>records.forEach(r =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>if (!grouped[r.company]) {</p>
-<p class="p1"><span class="Apple-converted-space">          </span>grouped[r.company] = { name: r.company, cats: new Set(), lenders: [] };</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>grouped[r.company].cats.add(r.category);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>grouped[r.company].lenders.push(`${r.bank}: ${r.category}`);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>let list = Object.values(grouped);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>if (q) {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>list = list.filter(item =&gt; item.name.toLowerCase().includes(q));</p>
-<p class="p1"><span class="Apple-converted-space">      </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>const displayList = list.slice(0, 100);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>if (displayList.length === 0) {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>tbody.innerHTML = `&lt;tr&gt;&lt;td colspan="3" style="text-align:center; color:var(--text-muted); padding:24px;"&gt;No matching companies found for "${escapeHTML(q)}"&lt;/td&gt;&lt;/tr&gt;`;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>return;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>tbody.innerHTML = displayList.map(item =&gt; `</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;tr&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;td style="font-weight:600;"&gt;${escapeHTML(item.name)}&lt;/td&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;td&gt;&lt;span class="badge"&gt;${escapeHTML([...item.cats][0] || 'N/A')}&lt;/span&gt;&lt;/td&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;td style="font-size:12px; color:var(--text-muted);"&gt;${escapeHTML(item.lenders.join(' | '))}&lt;/td&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/tr&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>`).join('');</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function openAddLinkModal(category = 'bank') {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('editId').value = '';</p>
-<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('linkModalTitle').textContent = 'Add Campaign Link';</p>
-<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('linkCategory').value = category;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('linkTitle').value = '';</p>
-<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('linkUrl').value = '';</p>
-<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('linkTag').value = '';</p>
-<p class="p1"><span class="Apple-converted-space">      </span>openModal('linkModal');</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function editLink(id) {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const item = state.links.find(l =&gt; l.id === id);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>if (!item) return;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('editId').value = item.id;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('linkModalTitle').textContent = 'Edit Link';</p>
-<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('linkCategory').value = item.category;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('linkTitle').value = item.title;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('linkUrl').value = item.url;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('linkTag').value = item.tag || '';</p>
-<p class="p1"><span class="Apple-converted-space">      </span>openModal('linkModal');</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function saveLink(e) {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>e.preventDefault();</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const id = document.getElementById('editId').value;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const linkObj = {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>id: id || Date.now().toString(),</p>
-<p class="p1"><span class="Apple-converted-space">        </span>category: document.getElementById('linkCategory').value,</p>
-<p class="p1"><span class="Apple-converted-space">        </span>title: document.getElementById('linkTitle').value.trim(),</p>
-<p class="p1"><span class="Apple-converted-space">        </span>url: document.getElementById('linkUrl').value.trim(),</p>
-<p class="p1"><span class="Apple-converted-space">        </span>tag: document.getElementById('linkTag').value.trim(),</p>
-<p class="p1"><span class="Apple-converted-space">        </span>pinned: id ? (state.links.find(l =&gt; l.id === id)?.pinned || false) : false</p>
-<p class="p1"><span class="Apple-converted-space">      </span>};</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>if (id) {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const idx = state.links.findIndex(l =&gt; l.id === id);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>if (idx &gt; -1) state.links[idx] = linkObj;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>state.links.unshift(linkObj);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>persist();</p>
-<p class="p1"><span class="Apple-converted-space">      </span>renderLinks();</p>
-<p class="p1"><span class="Apple-converted-space">      </span>closeModal('linkModal');</p>
-<p class="p1"><span class="Apple-converted-space">      </span>showToast('Link saved!');</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function deleteLink(id) {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>state.links = state.links.filter(l =&gt; l.id !== id);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>persist();</p>
-<p class="p1"><span class="Apple-converted-space">      </span>renderLinks();</p>
-<p class="p1"><span class="Apple-converted-space">      </span>showToast('Link removed');</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function togglePin(id) {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const item = state.links.find(l =&gt; l.id === id);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>if (item) {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>item.pinned = !item.pinned;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>persist();</p>
-<p class="p1"><span class="Apple-converted-space">        </span>renderLinks();</p>
-<p class="p1"><span class="Apple-converted-space">      </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function copyRaw(id) {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const item = state.links.find(l =&gt; l.id === id);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>if (!item) return;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>navigator.clipboard.writeText(item.url);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>state.totalCopies = (state.totalCopies || 0) + 1;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>persist();</p>
-<p class="p1"><span class="Apple-converted-space">      </span>showToast('Link copied!');</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function copyPitch(id) {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const item = state.links.find(l =&gt; l.id === id);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>if (!item) return;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const tpl = state.pitchTemplate || DEFAULT_PITCH;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const msg = tpl.replace(/\{TITLE\}/g, item.title).replace(/\{URL\}/g, item.url);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>navigator.clipboard.writeText(msg);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>state.totalCopies = (state.totalCopies || 0) + 1;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>persist();</p>
-<p class="p1"><span class="Apple-converted-space">      </span>showToast('Link + Pitch copied!');</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function savePitchTemplate() {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>state.pitchTemplate = document.getElementById('pitchTemplateInput').value.trim() || DEFAULT_PITCH;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>persist();</p>
-<p class="p1"><span class="Apple-converted-space">      </span>closeModal('pitchSettingsModal');</p>
-<p class="p1"><span class="Apple-converted-space">      </span>showToast('Pitch template updated!');</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function showQR(id) {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const item = state.links.find(l =&gt; l.id === id);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>if (!item) return;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('qrTitle').textContent = item.title;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('qrUrlText').textContent = item.url;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('qrImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&amp;data=${encodeURIComponent(item.url)}`;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>openModal('qrModal');</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function createCardHTML(item) {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>return `</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;article class="card ${item.pinned ? 'pinned' : ''}"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="card-top"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;span class="badge"&gt;${item.tag || (item.category === 'bank' ? 'BANK UTM' : 'CAMPAIGN')}&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;h3&gt;${escapeHTML(item.title)}&lt;/h3&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;div style="display:flex; gap:2px;"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;button class="icon-btn ${item.pinned ? 'active-pin' : ''}" onclick="togglePin('${item.id}')" title="Pin"&gt;★&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;button class="icon-btn" onclick="editLink('${item.id}')" title="Edit"&gt;✎&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;button class="icon-btn" onclick="deleteLink('${item.id}')" title="Delete"&gt;🗑&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="card-url" style="margin-top:8px;"&gt;${escapeHTML(item.url)}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="card-actions"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;button class="btn btn-primary btn-sm" onclick="copyRaw('${item.id}')"&gt;Copy Link&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;button class="btn btn-sm" onclick="copyPitch('${item.id}')"&gt;💬 Copy Pitch&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;button class="btn btn-sm" onclick="showQR('${item.id}')"&gt;QR&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;a class="btn btn-sm" href="${escapeHTML(item.url)}" target="_blank" rel="noopener"&gt;↗&lt;/a&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/article&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>`;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function renderLinks() {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const q = document.getElementById('searchInput').value.toLowerCase().trim();</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const filtered = state.links.filter(l =&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>l.title.toLowerCase().includes(q) ||</p>
-<p class="p1"><span class="Apple-converted-space">        </span>l.url.toLowerCase().includes(q) ||</p>
-<p class="p1"><span class="Apple-converted-space">        </span>(l.tag &amp;&amp; l.tag.toLowerCase().includes(q))</p>
-<p class="p1"><span class="Apple-converted-space">      </span>);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>const pinned = filtered.filter(l =&gt; l.pinned);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const banks = filtered.filter(l =&gt; l.category === 'bank');</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const others = filtered.filter(l =&gt; l.category === 'other');</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>const pinnedSec = document.getElementById('pinnedSection');</p>
-<p class="p1"><span class="Apple-converted-space">      </span>if (pinned.length &gt; 0) {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>pinnedSec.style.display = 'block';</p>
-<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('pinnedGrid').innerHTML = pinned.map(createCardHTML).join('');</p>
-<p class="p1"><span class="Apple-converted-space">      </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>pinnedSec.style.display = 'none';</p>
-<p class="p1"><span class="Apple-converted-space">      </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('bankGrid').innerHTML = banks.length</p>
-<p class="p1"><span class="Apple-converted-space">        </span>? banks.map(createCardHTML).join('')</p>
-<p class="p1"><span class="Apple-converted-space">        </span>: `&lt;div class="empty-state"&gt;No Bank UTM links yet. Click "+ Add Bank Link" to save one.&lt;/div&gt;`;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('otherGrid').innerHTML = others.length</p>
-<p class="p1"><span class="Apple-converted-space">        </span>? others.map(createCardHTML).join('')</p>
-<p class="p1"><span class="Apple-converted-space">        </span>: `&lt;div class="empty-state"&gt;No Other UTM links yet. Click "+ Add Other Link" to save one.&lt;/div&gt;`;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>updateStats();</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function updateStats() {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('statTotal').textContent = state.links.length;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('statCompaniesCount').textContent = (state.masterCompanies ? new Set(state.masterCompanies.map(r =&gt; r.company)).size : 0).toLocaleString();</p>
-<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('statBanksCount').textContent = (state.masterCompanies ? new Set(state.masterCompanies.map(r =&gt; r.bank)).size : 0);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function calcEMI() {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const P = parseFloat(document.getElementById('emiAmount').value) || 0;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const annualRate = parseFloat(document.getElementById('emiRate').value) || 0;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const N = parseInt(document.getElementById('emiMonths').value) || 1;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const R = annualRate / 12 / 100;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>let emi = (R === 0) ? (P / N) : (P * R * Math.pow(1 + R, N)) / (Math.pow(1 + R, N) - 1);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const total = emi * N;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const interest = total - P;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('emiMonthly').textContent = '₹' + Math.round(emi).toLocaleString('en-IN');</p>
-<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('emiInterest').textContent = '₹' + Math.round(interest).toLocaleString('en-IN');</p>
-<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('emiTotal').textContent = '₹' + Math.round(total).toLocaleString('en-IN');</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function renderSheets() {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const box = document.getElementById('sheetsList');</p>
-<p class="p1"><span class="Apple-converted-space">      </span>if (!state.sheets || state.sheets.length === 0) {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>box.innerHTML = `&lt;div style="font-size:12px; color:var(--text-muted);"&gt;No sheets added yet.&lt;/div&gt;`;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>return;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>}</p>
-<p class="p1"><span class="Apple-converted-space">      </span>box.innerHTML = state.sheets.sheets.map((s, idx) =&gt; `...`).join(''); // handled safely</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function escapeHTML(str) {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>return String(str).replace(/[&amp;&lt;&gt;"']/g, m =&gt; ({'&amp;':'&amp;amp;','&lt;':'&amp;lt;','&gt;':'&amp;gt;','"':'&amp;quot;',"'":'&amp;#39;'}[m]));</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>document.addEventListener('keydown', (e) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>if ((e.ctrlKey || e.metaKey) &amp;&amp; e.key.toLowerCase() === 'k') {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>e.preventDefault();</p>
-<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('searchInput').focus();</p>
-<p class="p1"><span class="Apple-converted-space">      </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>applyTheme();</p>
-<p class="p1"><span class="Apple-converted-space">    </span>renderLinks();</p>
-<p class="p1"><span class="Apple-converted-space">    </span>updateStats();</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/script&gt;</p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-icon">↗</div>
+        <div>
+          <strong>Avanish Links Hub</strong>
+          <small>Smart Workspace & Loan Portal</small>
+        </div>
+      </div>
+      <nav>
+        <button class="btn btn-primary" onclick="openModal('companySearchPortalModal')">🏢 Company Search Hub</button>
+        <button class="btn" onclick="openModal('sheetsModal')">📊 Sheets</button>
+        <button class="btn" onclick="openModal('emiModal')">🧮 EMI Calc</button>
+        <button class="btn" onclick="toggleNotes()">📝 Notes</button>
+        <button class="btn" onclick="toggleTheme()" id="themeBtn" title="Toggle Theme">🌙</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div>
+        <span class="tag">AVNISH LOAN OPERATIONS &amp; WORKSPACE</span>
+        <h1>Smart campaign links &amp;<br><em>Multi-bank company search.</em></h1>
+        <p>Manage your bank UTMs, quick access tools, and search corporate employer categories across all partner lenders instantly.</p>
+      </div>
+      <div class="stats">
+        <div class="stat-card">
+          <small>Active Links</small>
+          <strong id="statTotal">0</strong>
+        </div>
+        <div class="stat-card">
+          <small>Loaded Companies</small>
+          <strong id="statCompaniesCount">0</strong>
+        </div>
+        <div class="stat-card">
+          <small>Partner Banks</small>
+          <strong id="statBanksCount">0</strong>
+        </div>
+      </div>
+    </section>
+
+    <div class="toolbar">
+      <div class="search-box">
+        <span>🔍</span>
+        <input type="text" id="searchInput" placeholder="Search UTM links by name, bank, or tag... (Ctrl + K)" oninput="renderLinks()" />
+      </div>
+      <button class="btn btn-primary" onclick="openAddLinkModal()">+ Add New Link</button>
+      <button class="btn" onclick="openModal('pitchSettingsModal')">⚙️ Pitch Template</button>
+    </div>
+
+    <section class="section" id="pinnedSection" style="display:none;">
+      <div class="section-head">
+        <div>
+          <span class="tag">PINNED ACCESS</span>
+          <h2>Starred &amp; Frequent Links</h2>
+        </div>
+      </div>
+      <div class="grid" id="pinnedGrid"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <span class="tag">BANK CAMPAIGNS</span>
+          <h2>Banks UTM Links</h2>
+        </div>
+        <button class="btn btn-sm" onclick="openAddLinkModal('bank')">+ Add Bank Link</button>
+      </div>
+      <div class="grid" id="bankGrid"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <span class="tag">OTHER CAMPAIGNS</span>
+          <h2>Other UTM Links</h2>
+        </div>
+        <button class="btn btn-sm" onclick="openAddLinkModal('other')">+ Add Other Link</button>
+      </div>
+      <div class="grid" id="otherGrid"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <span class="tag">QUICK ACCESS</span>
+          <h2>Daily Work &amp; AI Tools</h2>
+        </div>
+      </div>
+      <div class="quick-grid">
+        <article class="quick-card">
+          <div>
+            <span class="badge">AI ASSISTANT</span>
+            <h3>ChatGPT</h3>
+            <p>AI assistant for drafts and troubleshooting.</p>
+          </div>
+          <a class="btn btn-sm" href="https://chatgpt.com" target="_blank" rel="noopener">Open website →</a>
+        </article>
+        <article class="quick-card">
+          <div>
+            <span class="badge">AI ASSISTANT</span>
+            <h3>Gemini</h3>
+            <p>Google AI assistant for research and analysis.</p>
+          </div>
+          <a class="btn btn-sm" href="https://gemini.google.com" target="_blank" rel="noopener">Open website →</a>
+        </article>
+        <article class="quick-card">
+          <div>
+            <span class="badge">BUSINESS</span>
+            <h3>CRM Portal</h3>
+            <p>Manage leads and client pipelines.</p>
+          </div>
+          <a class="btn btn-sm" href="https://www.hubspot.com/products/crm" target="_blank" rel="noopener">Open website →</a>
+        </article>
+        <article class="quick-card">
+          <div>
+            <span class="badge">WORKSPACE</span>
+            <h3>Notion</h3>
+            <p>Documentation, SOPs, and notes.</p>
+          </div>
+          <a class="btn btn-sm" href="https://www.notion.so" target="_blank" rel="noopener">Open website →</a>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <div>Avanish Sharma · Smart Hub · <span>Saved locally in browser</span></div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn btn-sm" onclick="exportBackup()">⬇️ Export Backup</button>
+        <button class="btn btn-sm" onclick="document.getElementById('importFile').click()">⬆️ Import Backup</button>
+        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importBackup(event)" />
+      </div>
+    </div>
+  </footer>
+
+  <dialog id="companySearchPortalModal" style="max-width:900px; width:95%;">
+    <div class="modal-head">
+      <h3>🏢 Multi-Bank Company Search Hub</h3>
+      <button class="icon-btn" onclick="closeModal('companySearchPortalModal')">✕</button>
+    </div>
+    <p style="font-size:13px; color:var(--text-muted); margin-bottom:14px;">
+      Upload your multi-sheet master Excel file once. Search any company name to instantly view its category across all partner banks side-by-side.
+    </p>
+
+    <div style="background:var(--surface-alt); border:2px dashed var(--border); padding:16px; border-radius:12px; text-align:center; margin-bottom:16px;">
+      <label style="cursor:pointer; display:block;">
+        <span style="font-weight:600; color:var(--primary); display:block; margin-bottom:4px;">📁 Upload Master Excel File (.xlsx)</span>
+        <span style="font-size:12px; color:var(--text-muted);">Supports multi-sheet bank workbooks with EMPLOYER_NAME & EMPLOYER_CATEGORY</span>
+        <input type="file" id="masterExcelInput" accept=".xlsx, .xls" style="display:none" onchange="handleMasterExcelUpload(event)" />
+      </label>
+      <div id="uploadStatus" style="font-size:12px; color:var(--accent); margin-top:8px; font-weight:600;"></div>
+    </div>
+
+    <div class="form-group">
+      <input type="text" id="masterCompanySearchInput" placeholder="Type company name (e.g. HDFC, Tata, Infosys...) to search across all banks..." oninput="renderMasterSearchResults()" />
+    </div>
+
+    <div class="table-container" style="max-height:400px; overflow-y:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>Company Legal Name</th>
+            <th>Primary Category</th>
+            <th>Lender Classifications (Bank &amp; Category)</th>
+          </tr>
+        </thead>
+        <tbody id="masterResultsBody">
+          <tr><td colspan="3" style="text-align:center; color:var(--text-muted); padding:24px;">Please upload your master Excel file above to begin searching.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </dialog>
+
+  <dialog id="linkModal">
+    <div class="modal-head">
+      <h3 id="linkModalTitle">Add Campaign Link</h3>
+      <button class="icon-btn" onclick="closeModal('linkModal')">✕</button>
+    </div>
+    <form onsubmit="saveLink(event)">
+      <input type="hidden" id="editId" />
+      <div class="form-group">
+        <label>Category</label>
+        <select id="linkCategory">
+          <option value="bank">Banks UTM Links</option>
+          <option value="other">Other UTM Links</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Link Title</label>
+        <input type="text" id="linkTitle" required placeholder="e.g. HDFC Personal Loan UTM" />
+      </div>
+      <div class="form-group">
+        <label>Campaign / UTM URL</label>
+        <input type="url" id="linkUrl" required placeholder="https://..." />
+      </div>
+      <div class="form-group">
+        <label>Short Tag / Note (Optional)</label>
+        <input type="text" id="linkTag" placeholder="e.g. Salaried · Instant Approval" />
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
+        <button type="button" class="btn" onclick="closeModal('linkModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Link</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="pitchSettingsModal">
+    <div class="modal-head">
+      <h3>Customize Pitch Message</h3>
+      <button class="icon-btn" onclick="closeModal('pitchSettingsModal')">✕</button>
+    </div>
+    <div class="form-group">
+      <label>Use <code>{TITLE}</code> and <code>{URL}</code> placeholders:</label>
+      <textarea id="pitchTemplateInput" rows="4"></textarea>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:8px;">
+      <button class="btn" onclick="closeModal('pitchSettingsModal')">Close</button>
+      <button class="btn btn-primary" onclick="savePitchTemplate()">Save Template</button>
+    </div>
+  </dialog>
+
+  <dialog id="qrModal" style="text-align:center; max-width:340px;">
+    <div class="modal-head">
+      <h3 id="qrTitle" style="font-size:15px;">Scan Link</h3>
+      <button class="icon-btn" onclick="closeModal('qrModal')">✕</button>
+    </div>
+    <img id="qrImage" src="" alt="QR Code" style="width:210px; height:210px; border-radius:10px; border:1px solid var(--border); padding:8px; background:#fff;" />
+    <p id="qrUrlText" style="font-size:11px; color:var(--text-muted); margin-top:10px; word-break:break-all;"></p>
+  </dialog>
+
+  <dialog id="emiModal">
+    <div class="modal-head">
+      <h3>Quick Loan EMI Calculator</h3>
+      <button class="icon-btn" onclick="closeModal('emiModal')">✕</button>
+    </div>
+    <div class="form-group">
+      <label>Loan Amount (₹)</label>
+      <input type="number" id="emiAmount" value="500000" oninput="calcEMI()" />
+    </div>
+    <div class="form-group">
+      <label>Interest Rate (% p.a.)</label>
+      <input type="number" step="0.1" id="emiRate" value="10.75" oninput="calcEMI()" />
+    </div>
+    <div class="form-group">
+      <label>Tenure (Months)</label>
+      <input type="number" id="emiMonths" value="36" oninput="calcEMI()" />
+    </div>
+    <div class="emi-box">
+      <div class="emi-main">
+        <small style="display:block; color:var(--text-muted);">Monthly EMI</small>
+        <strong id="emiMonthly">₹16,310</strong>
+      </div>
+      <div>
+        <small style="display:block; color:var(--text-muted);">Total Interest</small>
+        <strong id="emiInterest">₹87,160</strong>
+      </div>
+      <div>
+        <small style="display:block; color:var(--text-muted);">Total Payable</small>
+        <strong id="emiTotal">₹5,87,160</strong>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="sheetsModal">
+    <div class="modal-head">
+      <h3>Company Excel Sheets</h3>
+      <button class="icon-btn" onclick="closeModal('sheetsModal')">✕</button>
+    </div>
+    <p style="font-size:13px; color:var(--text-muted); margin-bottom:12px;">Save quick links to your Google Sheets or payout trackers.</p>
+    <div id="sheetsList" style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;"></div>
+    <form onsubmit="addSheet(event)" style="display:flex; gap:6px; flex-wrap:wrap;">
+      <input type="text" id="sheetName" placeholder="Sheet Name" required style="flex:1; padding:8px; border-radius:8px; border:1px solid var(--border); background:var(--surface-alt); color:var(--text);" />
+      <input type="url" id="sheetUrl" placeholder="Sheet URL" required style="flex:1; padding:8px; border-radius:8px; border:1px solid var(--border); background:var(--surface-alt); color:var(--text);" />
+      <button type="submit" class="btn btn-primary btn-sm">Add</button>
+    </form>
+  </dialog>
+
+  <aside class="drawer" id="notesDrawer">
+    <div class="modal-head">
+      <h3>📝 Quick Scratchpad</h3>
+      <button class="icon-btn" onclick="toggleNotes()">✕</button>
+    </div>
+    <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">Auto-saves as you type.</p>
+    <textarea id="notesArea" placeholder="Write client notes or callbacks here..." oninput="saveNotes()"></textarea>
+  </aside>
+
+  <div class="toast" id="toast">Copied!</div>
+
+  <script>
+    const STORAGE_KEY = 'avanish_hub_data_v2';
+    const DEFAULT_PITCH = "Hi, here is your verified application link for {TITLE}:\n{URL}\n\nLet me know once you complete the form!";
+
+    let state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
+      links: [],
+      sheets: [],
+      notes: "",
+      pitchTemplate: DEFAULT_PITCH,
+      theme: "light",
+      totalCopies: 0,
+      masterCompanies: []
+    };
+
+    function persist() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      updateStats();
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2200);
+    }
+
+    function applyTheme() {
+      document.documentElement.setAttribute('data-theme', state.theme || 'light');
+      document.getElementById('themeBtn').textContent = state.theme === 'dark' ? '☀️' : '🌙';
+    }
+    function toggleTheme() {
+      state.theme = state.theme === 'dark' ? 'light' : 'dark';
+      applyTheme();
+      persist();
+    }
+
+    function openModal(id) {
+      if (id === 'pitchSettingsModal') {
+        document.getElementById('pitchTemplateInput').value = state.pitchTemplate || DEFAULT_PITCH;
+      }
+      if (id === 'emiModal') calcEMI();
+      if (id === 'sheetsModal') renderSheets();
+      if (id === 'companySearchPortalModal') renderMasterSearchResults();
+      document.getElementById(id).showModal();
+    }
+    function closeModal(id) { document.getElementById(id).close(); }
+
+    function handleMasterExcelUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      document.getElementById('uploadStatus').textContent = "Reading multi-bank sheets...";
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const data = new Uint8Array(evt.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          let allRecords = [];
+
+          workbook.SheetNames.forEach(sheetName => {
+            const worksheet = workbook.Sheets[sheetName];
+            const json = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+
+            json.forEach(row => {
+              const normRow = {};
+              Object.keys(row).forEach(k => {
+                normRow[k.trim().toUpperCase()] = row[k];
+              });
+
+              const compName = normRow['EMPLOYER_NAME'] || normRow['COMPANY NAME'] || normRow['COMPANY'];
+              const category = normRow['EMPLOYER_CATEGORY'] || normRow['CATEGORY'] || normRow['CAT'];
+
+              if (compName) {
+                allRecords.push({
+                  company: String(compName).trim().toUpperCase(),
+                  bank: sheetName.trim(),
+                  category: String(category || 'Unclassified').trim()
+                });
+              }
+            });
+          });
+
+          state.masterCompanies = allRecords;
+          persist();
+          document.getElementById('uploadStatus').textContent = `Successfully loaded ${allRecords.length.toLocaleString()} records across ${workbook.SheetNames.length} bank sheets!`;
+          renderMasterSearchResults();
+          showToast('Master company data loaded!');
+        } catch (err) {
+          console.error(err);
+          document.getElementById('uploadStatus').textContent = "Error parsing excel file.";
+          showToast('Failed to read Excel file');
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    function renderMasterSearchResults() {
+      const q = (document.getElementById('masterCompanySearchInput')?.value || '').toLowerCase().trim();
+      const tbody = document.getElementById('masterResultsBody');
+      const records = state.masterCompanies || [];
+
+      if (records.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--text-muted); padding:24px;">No master company data loaded yet. Please upload your Excel file above.</td></tr>`;
+        return;
+      }
+
+      const grouped = {};
+      records.forEach(r => {
+        if (!grouped[r.company]) {
+          grouped[r.company] = { name: r.company, cats: new Set(), lenders: [] };
+        }
+        grouped[r.company].cats.add(r.category);
+        grouped[r.company].lenders.push(`${r.bank}: ${r.category}`);
+      });
+
+      let list = Object.values(grouped);
+      if (q) {
+        list = list.filter(item => item.name.toLowerCase().includes(q));
+      }
+
+      const displayList = list.slice(0, 100);
+
+      if (displayList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--text-muted); padding:24px;">No matching companies found for "${escapeHTML(q)}"</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = displayList.map(item => `
+        <tr>
+          <td style="font-weight:600;">${escapeHTML(item.name)}</td>
+          <td><span class="badge">${escapeHTML([...item.cats][0] || 'N/A')}</span></td>
+          <td style="font-size:12px; color:var(--text-muted);">${escapeHTML(item.lenders.join(' | '))}</td>
+        </tr>
+      `).join('');
+    }
+
+    function openAddLinkModal(category = 'bank') {
+      document.getElementById('editId').value = '';
+      document.getElementById('linkModalTitle').textContent = 'Add Campaign Link';
+      document.getElementById('linkCategory').value = category;
+      document.getElementById('linkTitle').value = '';
+      document.getElementById('linkUrl').value = '';
+      document.getElementById('linkTag').value = '';
+      openModal('linkModal');
+    }
+
+    function editLink(id) {
+      const item = state.links.find(l => l.id === id);
+      if (!item) return;
+      document.getElementById('editId').value = item.id;
+      document.getElementById('linkModalTitle').textContent = 'Edit Link';
+      document.getElementById('linkCategory').value = item.category;
+      document.getElementById('linkTitle').value = item.title;
+      document.getElementById('linkUrl').value = item.url;
+      document.getElementById('linkTag').value = item.tag || '';
+      openModal('linkModal');
+    }
+
+    function saveLink(e) {
+      e.preventDefault();
+      const id = document.getElementById('editId').value;
+      const linkObj = {
+        id: id || Date.now().toString(),
+        category: document.getElementById('linkCategory').value,
+        title: document.getElementById('linkTitle').value.trim(),
+        url: document.getElementById('linkUrl').value.trim(),
+        tag: document.getElementById('linkTag').value.trim(),
+        pinned: id ? (state.links.find(l => l.id === id)?.pinned || false) : false
+      };
+
+      if (id) {
+        const idx = state.links.findIndex(l => l.id === id);
+        if (idx > -1) state.links[idx] = linkObj;
+      } else {
+        state.links.unshift(linkObj);
+      }
+
+      persist();
+      renderLinks();
+      closeModal('linkModal');
+      showToast('Link saved!');
+    }
+
+    function deleteLink(id) {
+      state.links = state.links.filter(l => l.id !== id);
+      persist();
+      renderLinks();
+      showToast('Link removed');
+    }
+
+    function togglePin(id) {
+      const item = state.links.find(l => l.id === id);
+      if (item) {
+        item.pinned = !item.pinned;
+        persist();
+        renderLinks();
+      }
+    }
+
+    function copyRaw(id) {
+      const item = state.links.find(l => l.id === id);
+      if (!item) return;
+      navigator.clipboard.writeText(item.url);
+      state.totalCopies = (state.totalCopies || 0) + 1;
+      persist();
+      showToast('Link copied!');
+    }
+
+    function copyPitch(id) {
+      const item = state.links.find(l => l.id === id);
+      if (!item) return;
+      const tpl = state.pitchTemplate || DEFAULT_PITCH;
+      const msg = tpl.replace(/\{TITLE\}/g, item.title).replace(/\{URL\}/g, item.url);
+      navigator.clipboard.writeText(msg);
+      state.totalCopies = (state.totalCopies || 0) + 1;
+      persist();
+      showToast('Link + Pitch copied!');
+    }
+
+    function savePitchTemplate() {
+      state.pitchTemplate = document.getElementById('pitchTemplateInput').value.trim() || DEFAULT_PITCH;
+      persist();
+      closeModal('pitchSettingsModal');
+      showToast('Pitch template updated!');
+    }
+
+    function showQR(id) {
+      const item = state.links.find(l => l.id === id);
+      if (!item) return;
+      document.getElementById('qrTitle').textContent = item.title;
+      document.getElementById('qrUrlText').textContent = item.url;
+      document.getElementById('qrImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(item.url)}`;
+      openModal('qrModal');
+    }
+
+    function createCardHTML(item) {
+      return `
+        <article class="card ${item.pinned ? 'pinned' : ''}">
+          <div>
+            <div class="card-top">
+              <div>
+                <span class="badge">${item.tag || (item.category === 'bank' ? 'BANK UTM' : 'CAMPAIGN')}</span>
+                <h3>${escapeHTML(item.title)}</h3>
+              </div>
+              <div style="display:flex; gap:2px;">
+                <button class="icon-btn ${item.pinned ? 'active-pin' : ''}" onclick="togglePin('${item.id}')" title="Pin">★</button>
+                <button class="icon-btn" onclick="editLink('${item.id}')" title="Edit">✎</button>
+                <button class="icon-btn" onclick="deleteLink('${item.id}')" title="Delete">🗑</button>
+              </div>
+            </div>
+            <div class="card-url" style="margin-top:8px;">${escapeHTML(item.url)}</div>
+          </div>
+          <div class="card-actions">
+            <button class="btn btn-primary btn-sm" onclick="copyRaw('${item.id}')">Copy Link</button>
+            <button class="btn btn-sm" onclick="copyPitch('${item.id}')">💬 Copy Pitch</button>
+            <button class="btn btn-sm" onclick="showQR('${item.id}')">QR</button>
+            <a class="btn btn-sm" href="${escapeHTML(item.url)}" target="_blank" rel="noopener">↗</a>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderLinks() {
+      const q = document.getElementById('searchInput').value.toLowerCase().trim();
+      const filtered = state.links.filter(l =>
+        l.title.toLowerCase().includes(q) ||
+        l.url.toLowerCase().includes(q) ||
+        (l.tag && l.tag.toLowerCase().includes(q))
+      );
+
+      const pinned = filtered.filter(l => l.pinned);
+      const banks = filtered.filter(l => l.category === 'bank');
+      const others = filtered.filter(l => l.category === 'other');
+
+      const pinnedSec = document.getElementById('pinnedSection');
+      if (pinned.length > 0) {
+        pinnedSec.style.display = 'block';
+        document.getElementById('pinnedGrid').innerHTML = pinned.map(createCardHTML).join('');
+      } else {
+        pinnedSec.style.display = 'none';
+      }
+
+      document.getElementById('bankGrid').innerHTML = banks.length
+        ? banks.map(createCardHTML).join('')
+        : `<div class="empty-state">No Bank UTM links yet. Click "+ Add Bank Link" to save one.</div>`;
+
+      document.getElementById('otherGrid').innerHTML = others.length
+        ? others.map(createCardHTML).join('')
+        : `<div class="empty-state">No Other UTM links yet. Click "+ Add Other Link" to save one.</div>`;
+
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('statTotal').textContent = state.links.length;
+      document.getElementById('statCompaniesCount').textContent = (state.masterCompanies ? new Set(state.masterCompanies.map(r => r.company)).size : 0).toLocaleString();
+      document.getElementById('statBanksCount').textContent = (state.masterCompanies ? new Set(state.masterCompanies.map(r => r.bank)).size : 0);
+    }
+
+    function calcEMI() {
+      const P = parseFloat(document.getElementById('emiAmount').value) || 0;
+      const annualRate = parseFloat(document.getElementById('emiRate').value) || 0;
+      const N = parseInt(document.getElementById('emiMonths').value) || 1;
+      const R = annualRate / 12 / 100;
+
+      let emi = (R === 0) ? (P / N) : (P * R * Math.pow(1 + R, N)) / (Math.pow(1 + R, N) - 1);
+      const total = emi * N;
+      const interest = total - P;
+
+      document.getElementById('emiMonthly').textContent = '₹' + Math.round(emi).toLocaleString('en-IN');
+      document.getElementById('emiInterest').textContent = '₹' + Math.round(interest).toLocaleString('en-IN');
+      document.getElementById('emiTotal').textContent = '₹' + Math.round(total).toLocaleString('en-IN');
+    }
+
+    function renderSheets() {
+      const box = document.getElementById('sheetsList');
+      if (!state.sheets || state.sheets.length === 0) {
+        box.jsonHTML = '';
+        box.innerHTML = `<div style="font-size:12px; color:var(--text-muted);">No sheets added yet.</div>`;
+        return;
+      }
+      box.innerHTML = state.sheets.map((s, idx) => `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 10px; background:var(--surface-alt); border-radius:8px;">
+          <a href="${escapeHTML(s.url)}" target="_blank" rel="noopener" style="color:var(--primary); font-weight:500; font-size:13px; text-decoration:none;">📊 ${escapeHTML(s.name)} ↗</a>
+          <button class="icon-btn" onclick="deleteSheet(${idx})">✕</button>
+        </div>
+      `).join('');
+    }
+    function addSheet(e) {
+      e.preventDefault();
+      state.sheets = state.sheets || [];
+      state.sheets.push({
+        name: document.getElementById('sheetName').value.trim(),
+        url: document.getElementById('sheetUrl').value.trim()
+      });
+      document.getElementById('sheetName').value = '';
+      document.getElementById('sheetUrl').value = '';
+      persist();
+      renderSheets();
+    }
+    function deleteSheet(idx) {
+      state.sheets.splice(idx, 1);
+      persist();
+      renderSheets();
+    }
+
+    function toggleNotes() {
+      const d = document.getElementById('notesDrawer');
+      d.classList.toggle('open');
+      if (d.classList.contains('open')) {
+        document.getElementById('notesArea').value = state.notes || '';
+      }
+    }
+    function saveNotes() {
+      state.notes = document.getElementById('notesArea').value;
+      persist();
+    }
+
+    function exportBackup() {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `avanish-hub-backup-${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      showToast('Backup downloaded!');
+    }
+    function importBackup(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const imported = JSON.parse(ev.target.result);
+          if (imported && Array.isArray(imported.links)) {
+            state = imported;
+            persist();
+            applyTheme();
+            renderLinks();
+            showToast('Backup restored successfully!');
+          }
+        } catch {
+          showToast('Invalid backup file');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function escapeHTML(str) {
+      return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        document.getElementById('searchInput').focus();
+      }
+    });
+
+    applyTheme();
+    renderLinks();
+    updateStats();
+  </script>
 </body>
 </html>
